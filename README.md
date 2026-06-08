@@ -2,6 +2,12 @@
 
 Smooth GSAP-style gradient button library. Click any button to copy its CSS parameters.
 
+## Open The Live Page
+
+[Open Beautiful Button](https://eliodengdeng.github.io/beautiful-button/)
+
+This repository is connected to GitHub Pages from the `main` branch. After updates are pushed to GitHub, the live page above updates automatically. GitHub may take a short moment to rebuild and refresh the page.
+
 ![Beautiful button preview](./渐变button/assets/preview.png)
 
 ## Project Files
@@ -13,9 +19,7 @@ Smooth GSAP-style gradient button library. Click any button to copy its CSS para
 
 ## How To Use
 
-On GitHub, click or download `渐变button/index.html` if you want the actual HTML file. GitHub's file viewer shows the source code, so for a live page use GitHub Pages:
-
-`https://eliodengdeng.github.io/beautiful-button/`
+Use the live page link above for the interactive version. GitHub's file viewer shows HTML source code, so clicking `渐变button/index.html` inside the repository is for viewing or downloading the file, not for running the page.
 
 You can also download the repository and open `渐变button/index.html` directly in a browser.
 
