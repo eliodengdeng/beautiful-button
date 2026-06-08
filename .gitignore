@@ -8,6 +8,22 @@
 比赛官网-黑版/
 比赛官网2.0/
 
+# Local contest website files not part of beautiful-button
+components.json
+package-lock.json
+package.json
+postcss.config.js
+public/
+skills-lock.json
+src/
+tailwind.config.ts
+tsconfig.json
+tsconfig.node.json
+vite.config.d.ts
+vite.config.js
+vite.config.ts
+文字.pdf
+
 # Logs
 logs
 *.log
