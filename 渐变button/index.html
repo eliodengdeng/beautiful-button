@@ -1,0 +1,1059 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smooth GSAP Gradient Guide</title>
+    <style>
+      :root {
+        --absolute-zero: #0e100f;
+        --frosted-canvas: #fffce1;
+        --faded-steel: #7c7c6f;
+        --fiery-orange: #ff8709;
+        --neon-pink: #fec5fb;
+        --soft-pink: #f7bdf8;
+        --soft-rose: #f08ad8;
+        --digital-violet: #9d95ff;
+        --aqua-glow: #00bae2;
+        --shock-green: #0ae448;
+        --light-green: #abff84;
+        --sky-bright: #15bfe4;
+        --radius-card: 8px;
+        --radius-pill: 100px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--absolute-zero);
+        color: var(--frosted-canvas);
+        font-family:
+          ui-sans-serif,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          "Noto Sans SC",
+          "PingFang SC",
+          sans-serif;
+        text-rendering: geometricPrecision;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        background: var(--absolute-zero);
+      }
+
+      .page {
+        width: min(1240px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 24px 0 72px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.56fr);
+        gap: clamp(24px, 5vw, 64px);
+        align-items: end;
+        margin-bottom: 34px;
+      }
+
+      .kicker {
+        display: inline-flex;
+        width: fit-content;
+        border: 1px solid rgba(255, 252, 225, 0.5);
+        border-radius: var(--radius-pill);
+        padding: 8px 14px;
+        color: var(--neon-pink);
+        font-size: 14px;
+        line-height: 1;
+      }
+
+      h1 {
+        max-width: 880px;
+        margin: 20px 0 0;
+        color: var(--frosted-canvas);
+        font-size: clamp(42px, 7.4vw, 96px);
+        font-weight: 650;
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      .hero p {
+        margin: 0;
+        color: color-mix(in srgb, var(--frosted-canvas) 78%, transparent);
+        font-size: 18px;
+        line-height: 1.55;
+      }
+
+      .token-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 34px;
+        padding: 16px;
+        border: 1px solid rgba(255, 252, 225, 0.14);
+        border-radius: var(--radius-card);
+        background: rgba(255, 252, 225, 0.035);
+      }
+
+      .token {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 252, 225, 0.16);
+        border-radius: var(--radius-pill);
+        padding: 8px 12px;
+        color: color-mix(in srgb, var(--frosted-canvas) 84%, transparent);
+        font-size: 13px;
+        white-space: nowrap;
+      }
+
+      .swatch {
+        width: 14px;
+        height: 14px;
+        border: 1px solid rgba(14, 16, 15, 0.24);
+        border-radius: 50%;
+        background: var(--swatch);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .gradient-set {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius-card);
+        background: rgba(255, 252, 225, 0.035);
+        cursor: pointer;
+      }
+
+      .gradient-set::before {
+        content: none;
+      }
+
+      .set-inner {
+        position: relative;
+        display: grid;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      .set-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      h2 {
+        margin: 0;
+        color: var(--frosted-canvas);
+        font-size: 22px;
+        font-weight: 650;
+        line-height: 1.12;
+        letter-spacing: 0;
+      }
+
+      .tag {
+        flex: 0 0 auto;
+        border: 1px solid color-mix(in srgb, var(--accent-a) 66%, var(--frosted-canvas));
+        border-radius: var(--radius-pill);
+        padding: 7px 10px;
+        color: var(--accent-a);
+        font-size: 12px;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .sample-card {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        min-height: 148px;
+        align-items: flex-end;
+        border-radius: var(--radius-card);
+        padding: 16px;
+        color: var(--sample-text);
+        background: var(--gradient);
+      }
+
+      .sample-card p {
+        position: relative;
+        z-index: 1;
+        max-width: 320px;
+        margin: 0;
+        font-size: clamp(22px, 2.4vw, 30px);
+        font-weight: 650;
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .button-column {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .sample-button {
+        position: relative;
+        display: inline-flex;
+        min-height: 58px;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-pill);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 650;
+        letter-spacing: 0;
+        border: none;
+        padding: 16px 20px;
+        color: var(--button-text);
+        background: var(--gradient);
+        cursor: pointer;
+        overflow: hidden;
+        will-change: transform;
+        transform: translate3d(0, 0, 0);
+      }
+
+      .sample-button .button-label {
+        position: relative;
+        z-index: 1;
+        pointer-events: none;
+        will-change: transform;
+        transform: translate3d(0, 0, 0);
+      }
+
+      .outline-button {
+        border: none;
+        padding: 0;
+        background: rgba(255, 252, 225, 0.08);
+        color: var(--frosted-canvas);
+      }
+
+      .outline-button span {
+        display: inline-flex;
+        width: 100%;
+        min-height: 48px;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-pill);
+        background: transparent;
+        color: var(--frosted-canvas);
+      }
+
+      .spec {
+        display: grid;
+        color: color-mix(in srgb, var(--frosted-canvas) 76%, transparent);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .label {
+        color: var(--faded-steel);
+      }
+
+      code {
+        display: block;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        color: var(--frosted-canvas);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 12px;
+      }
+
+      .usage {
+        border-top: 1px solid rgba(255, 252, 225, 0.1);
+        padding-top: 12px;
+        color: color-mix(in srgb, var(--frosted-canvas) 78%, transparent);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .footer-note {
+        margin-top: 34px;
+        border: 1px solid rgba(255, 252, 225, 0.14);
+        border-radius: var(--radius-card);
+        padding: 16px;
+        color: color-mix(in srgb, var(--frosted-canvas) 78%, transparent);
+        font-size: 15px;
+        line-height: 1.55;
+      }
+
+      @media (max-width: 1080px) {
+        .grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 520px) {
+        .page {
+          width: min(100% - 24px, 1240px);
+          padding-top: 32px;
+        }
+
+        .grid,
+        .set-top,
+        .button-column {
+          grid-template-columns: 1fr;
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="grid" id="gradientGrid"></section>
+
+    </main>
+
+    <script src="/node_modules/gsap/dist/gsap.min.js"></script>
+    <script>
+      const gradients = [
+        {
+          name: "01 Orange Crush Smooth",
+          tag: "warm adjacent",
+          text: "dynamic",
+          cta: "orange",
+          ghost: "copy css",
+          gradient: "linear-gradient(111.45deg, #ff8709 14%, #ff9a54 44%, #f7bdf8 84%)",
+          textColor: "#0e100f",
+          accentA: "#ff8709",
+          accentB: "#f7bdf8",
+          usage: "以 CodePen 的 Orange Crush 为基础，增加桃橙和粉紫中间段，让橙到粉更顺。",
+        },
+        {
+          name: "02 Orange Cream Bloom",
+          tag: "warm radial",
+          text: "soft orange",
+          cta: "submit",
+          ghost: "copy css",
+          gradient: "radial-gradient(85% 120% at 6% 88%, #ff8709 0%, #ffd9b0 58%, #f7bdf8 100%)",
+          textColor: "#0e100f",
+          accentA: "#ff8709",
+          accentB: "#f7bdf8",
+          usage: "类似你说图三可接受的弧形光感。暖色一组，整体很柔，不会有硬切。",
+        },
+        {
+          name: "03 Tangerine Milk",
+          tag: "warm radial",
+          text: "tangerine",
+          cta: "warm",
+          ghost: "copy css",
+          gradient: "radial-gradient(78% 92% at 0% 78%, #ffd9b0 0%, #fd9f3b 54%, #ff8709 96%)",
+          textColor: "#0e100f",
+          accentA: "#ffd9b0",
+          accentB: "#ff8709",
+          usage: "橙色家族里更奶油、更低攻击性，适合卡片背景或温和 CTA。",
+        },
+        {
+          name: "04 Lipstick Silk",
+          tag: "pink adjacent",
+          text: "lipstick",
+          cta: "pink",
+          ghost: "copy css",
+          gradient: "linear-gradient(158deg, #fff0fb 0%, #fec5fb 44%, #f08ad8 100%)",
+          textColor: "#0e100f",
+          accentA: "#fec5fb",
+          accentB: "#f08ad8",
+          usage: "粉到玫红，但用中间粉紫过渡，避免突然变深。适合 Hook、重点提示。",
+        },
+        {
+          name: "05 Rose Glow",
+          tag: "pink radial",
+          text: "rose glow",
+          cta: "hook",
+          ghost: "copy css",
+          gradient: "radial-gradient(95% 110% at 22% 16%, #fff0fb 0%, #fec5fb 58%, #f08ad8 100%)",
+          textColor: "#0e100f",
+          accentA: "#fec5fb",
+          accentB: "#f08ad8",
+          usage: "更亮的粉色弧形高光。卡片上用黑字，整体像柔光而不是色块拼接。",
+        },
+        {
+          name: "06 Summer Fair Smooth",
+          tag: "blue pink adjacent",
+          text: "summer fair",
+          cta: "blue pink",
+          ghost: "copy css",
+          gradient: "linear-gradient(144.02deg, #00bae2 4.56%, #a6efff 44%, #fec5fb 82%)",
+          textColor: "#0e100f",
+          accentA: "#00bae2",
+          accentB: "#fec5fb",
+          usage: "以 CodePen 的 Summer Fair 为基础，加青蓝、浅蓝和淡紫过渡，融合更 smooth。",
+        },
+        {
+          name: "07 UI Aqua Bloom",
+          tag: "blue radial",
+          text: "interface",
+          cta: "interface",
+          ghost: "copy css",
+          gradient: "radial-gradient(78.77% 78.77% at 71.71% 30.77%, #f0fcff 0%, #9bedff 62%, #00bae2 100%)",
+          textColor: "#0e100f",
+          accentA: "#f0fcff",
+          accentB: "#00bae2",
+          usage: "图三那种弧形光感的蓝色版本。适合按钮、功能卡、信息入口。",
+        },
+        {
+          name: "08 Skyfall Soft",
+          tag: "blue adjacent",
+          text: "skyfall",
+          cta: "sky",
+          ghost: "copy css",
+          gradient: "linear-gradient(131.77deg, #9d95ff 8%, #6fdcff 54%, #15bfe4 92%)",
+          textColor: "#0e100f",
+          accentA: "#9d95ff",
+          accentB: "#15bfe4",
+          usage: "深蓝到青蓝，但加了两段中间蓝，视觉更像夜色慢慢亮起来。",
+        },
+        {
+          name: "09 Purple Haze Smooth",
+          tag: "pink violet blue",
+          text: "purple haze",
+          cta: "purple",
+          ghost: "copy css",
+          gradient: "linear-gradient(153.58deg, #fec5fb 0%, #b9a8ff 54%, #9d95ff 104%)",
+          textColor: "#0e100f",
+          accentA: "#f7bdf8",
+          accentB: "#9d95ff",
+          usage: "以 CodePen 的 Purple Haze 为基础，增加紫色过渡段，粉到蓝更像一条色相带。",
+        },
+        {
+          name: "10 Lavender Pool",
+          tag: "violet radial",
+          text: "lavender",
+          cta: "creative",
+          ghost: "copy css",
+          gradient: "radial-gradient(92% 108% at 14% 20%, #fff0fb 0%, #c9b7ff 54%, #9d95ff 116%)",
+          textColor: "#0e100f",
+          accentA: "#fec5fb",
+          accentB: "#9d95ff",
+          usage: "粉紫蓝的径向版本，弧度比线性更自然，适合大卡片背景。",
+        },
+        {
+          name: "11 Aqua Violet Mist",
+          tag: "cool adjacent",
+          text: "aqua mist",
+          cta: "gallery",
+          ghost: "copy css",
+          gradient: "linear-gradient(140deg, #00bae2 0%, #b8d6ff 58%, #fec5fb 110%)",
+          textColor: "#0e100f",
+          accentA: "#00bae2",
+          accentB: "#fec5fb",
+          usage: "青、蓝、淡紫、粉在相邻色区里推过去，适合作品展示和轻量信息。",
+        },
+        {
+          name: "12 Pink Aqua Silk",
+          tag: "cool soft",
+          text: "pink aqua",
+          cta: "learn more",
+          ghost: "copy css",
+          gradient: "linear-gradient(168.89deg, #fec5fb -10%, #b9dfff 50%, #00bae2 104%)",
+          textColor: "#0e100f",
+          accentA: "#fec5fb",
+          accentB: "#00bae2",
+          usage: "把 UI Text 的粉青方向变得更丝滑，中间有淡紫和浅蓝桥接。",
+        },
+        {
+          name: "13 Macha Smooth",
+          tag: "green exact",
+          text: "macha",
+          cta: "green",
+          ghost: "copy css",
+          gradient: "linear-gradient(114.41deg, #0ae448 20.74%, #5df069 42%, #abff84 65.5%)",
+          textColor: "#0e100f",
+          accentA: "#0ae448",
+          accentB: "#abff84",
+          usage: "回到 GSAP 经典绿色，但加一点中间绿，避免从深绿直接跳到浅绿。",
+        },
+        {
+          name: "14 Core Green Glow",
+          tag: "green radial",
+          text: "core green",
+          cta: "core",
+          ghost: "copy css",
+          gradient: "radial-gradient(89.08% 84.62% at 16.54% 78.46%, #fbfefa 0%, #abff84 70%, #2fee65 100%)",
+          textColor: "#0e100f",
+          accentA: "#dfffd1",
+          accentB: "#2fee65",
+          usage: "GreenSock core green 的柔光版本，白绿、浅绿、亮绿在同一色相里融合。",
+        },
+        {
+          name: "15 Emerald City Smooth",
+          tag: "green aqua",
+          text: "emerald",
+          cta: "emerald",
+          ghost: "copy css",
+          gradient: "linear-gradient(150deg, #0ae448 4%, #8dfb92 52%, #00bae2 108%)",
+          textColor: "#0e100f",
+          accentA: "#0ae448",
+          accentB: "#00bae2",
+          usage: "绿到青是相邻色，加入薄荷过渡后很统一。适合你想要的绿色但不突兀。",
+        },
+        {
+          name: "16 Mint Sky",
+          tag: "green blue",
+          text: "mint sky",
+          cta: "mint",
+          ghost: "copy css",
+          gradient: "radial-gradient(92% 104% at 80% 20%, #eaffdf 0%, #abff84 46%, #00bae2 110%)",
+          textColor: "#0e100f",
+          accentA: "#abff84",
+          accentB: "#00bae2",
+          usage: "薄荷绿到青蓝的弧形渐变，颜色很轻，适合清爽的卡片和按钮。",
+        },
+        {
+          name: "17 Green UI Bloom",
+          tag: "green aqua radial",
+          text: "green ui",
+          cta: "interface",
+          ghost: "copy css",
+          gradient: "radial-gradient(86% 96% at 72% 28%, #f3ffee 0%, #abff84 56%, #00bae2 112%)",
+          textColor: "#0e100f",
+          accentA: "#abff84",
+          accentB: "#00bae2",
+          usage: "绿色和 UI 蓝的融合版，适合把 GSAP 绿接到蓝色体系里。",
+        },
+        {
+          name: "18 Lime Blush",
+          tag: "soft bridge",
+          text: "lime blush",
+          cta: "fresh",
+          ghost: "copy css",
+          gradient: "linear-gradient(128deg, #abff84 0%, #fff0e0 56%, #f7bdf8 100%)",
+          textColor: "#0e100f",
+          accentA: "#abff84",
+          accentB: "#f7bdf8",
+          usage: "绿到粉之间用奶白和暖白桥接，所以不会硬撞。适合比较柔的活动视觉。",
+        },
+        {
+          name: "19 Full Spectrum Soft",
+          tag: "system blend",
+          text: "soft system",
+          cta: "overview",
+          ghost: "copy css",
+          gradient: "linear-gradient(132deg, #0ae448 0%, #5be1ff 48%, #fec5fb 100%)",
+          textColor: "#0e100f",
+          accentA: "#0ae448",
+          accentB: "#fec5fb",
+          usage: "完整系统色但按相邻顺序排列：绿、薄荷、青、紫、粉。比随机四色更统一。",
+        },
+        {
+          name: "20 GSAP Candy Arc",
+          tag: "system radial",
+          text: "candy arc",
+          cta: "guide",
+          ghost: "copy css",
+          gradient: "radial-gradient(112% 128% at 8% 92%, #0ae448 0%, #9bedff 54%, #ff8709 122%)",
+          textColor: "#0e100f",
+          accentA: "#0ae448",
+          accentB: "#ff8709",
+          usage: "综合色的弧形版，适合做总览卡或主视觉局部。颜色多，但由弧形光晕串起来。",
+        },
+        {
+          name: "21 Violet Pink Melt",
+          tag: "violet pink",
+          text: "violet pink",
+          cta: "melt",
+          ghost: "copy css",
+          gradient: "linear-gradient(142deg, #9d95ff 0%, #b9a8ff 52%, #fec5fb 100%)",
+          textColor: "#0e100f",
+          accentA: "#9d95ff",
+          accentB: "#fec5fb",
+          usage: "",
+        },
+        {
+          name: "22 Pink Violet Bloom",
+          tag: "pink violet radial",
+          text: "pink violet",
+          cta: "bloom",
+          ghost: "copy css",
+          gradient: "radial-gradient(98% 112% at 12% 14%, #fff0fb 0%, #f7bdf8 48%, #7167e9 112%)",
+          textColor: "#0e100f",
+          accentA: "#fec5fb",
+          accentB: "#9d95ff",
+          usage: "",
+        },
+        {
+          name: "23 Purple Green Aurora",
+          tag: "violet green",
+          text: "purple green",
+          cta: "aurora",
+          ghost: "copy css",
+          gradient: "linear-gradient(138deg, #9d95ff 0%, #b9a8ff 44%, #0ae448 110%)",
+          textColor: "#0e100f",
+          accentA: "#9d95ff",
+          accentB: "#0ae448",
+          usage: "",
+        },
+        {
+          name: "24 Violet Mint Arc",
+          tag: "violet green radial",
+          text: "violet mint",
+          cta: "mint",
+          ghost: "copy css",
+          gradient: "radial-gradient(106% 118% at 82% 14%, #f3ffee 0%, #abff84 40%, #9d95ff 112%)",
+          textColor: "#0e100f",
+          accentA: "#abff84",
+          accentB: "#9d95ff",
+          usage: "",
+        },
+        {
+          name: "25 Green Pink Sorbet",
+          tag: "green pink",
+          text: "green pink",
+          cta: "sorbet",
+          ghost: "copy css",
+          gradient: "linear-gradient(132deg, #0ae448 0%, #e8ffdd 52%, #f7bdf8 100%)",
+          textColor: "#0e100f",
+          accentA: "#0ae448",
+          accentB: "#f7bdf8",
+          usage: "",
+        },
+        {
+          name: "26 Lime Rose Glow",
+          tag: "green pink radial",
+          text: "lime rose",
+          cta: "fresh",
+          ghost: "copy css",
+          gradient: "radial-gradient(102% 116% at 12% 84%, #0ae448 0%, #e8ffdd 50%, #fec5fb 118%)",
+          textColor: "#0e100f",
+          accentA: "#abff84",
+          accentB: "#fec5fb",
+          usage: "",
+        },
+        {
+          name: "27 Violet Orange Heat",
+          tag: "violet orange",
+          text: "violet orange",
+          cta: "heat",
+          ghost: "copy css",
+          gradient: "linear-gradient(136deg, #9d95ff 0%, #f7bdf8 52%, #ffd9b0 112%)",
+          textColor: "#0e100f",
+          accentA: "#9d95ff",
+          accentB: "#ff8709",
+          usage: "",
+        },
+        {
+          name: "28 Orange Violet Arc",
+          tag: "orange violet radial",
+          text: "orange violet",
+          cta: "glow",
+          ghost: "copy css",
+          gradient: "radial-gradient(104% 118% at 10% 90%, #ff8709 0%, #f7bdf8 58%, #9d95ff 118%)",
+          textColor: "#0e100f",
+          accentA: "#ff8709",
+          accentB: "#9d95ff",
+          usage: "",
+        },
+        {
+          name: "29 Purple Peach Silk",
+          tag: "violet orange soft",
+          text: "purple peach",
+          cta: "silk",
+          ghost: "copy css",
+          gradient: "linear-gradient(128deg, #9d95ff 0%, #f7bdf8 52%, #ffd9b0 112%)",
+          textColor: "#0e100f",
+          accentA: "#9d95ff",
+          accentB: "#ff8709",
+          usage: "",
+        },
+        {
+          name: "30 Unified GSAP Flow",
+          tag: "harmony set",
+          text: "unified flow",
+          cta: "system",
+          ghost: "copy css",
+          gradient: "linear-gradient(132deg, #0ae448 0%, #b9a8ff 56%, #ff9a54 100%)",
+          textColor: "#0e100f",
+          accentA: "#0ae448",
+          accentB: "#ff8709",
+          usage: "",
+        },
+        {
+          name: "31 Peach Pink",
+          gradient: "linear-gradient(118deg, #ff8709 0%, #ffd9b0 48%, #fec5fb 100%)",
+          textColor: "#0e100f",
+          accentA: "#ff8709",
+          accentB: "#fec5fb",
+        },
+        {
+          name: "32 Coral Rose",
+          gradient: "radial-gradient(96% 110% at 10% 90%, #ff9a54 0%, #f7bdf8 62%, #f08ad8 120%)",
+          textColor: "#0e100f",
+          accentA: "#ff8709",
+          accentB: "#f08ad8",
+        },
+        {
+          name: "33 Violet Cream",
+          gradient: "linear-gradient(136deg, #9d95ff 0%, #c9b7ff 58%, #fff0fb 100%)",
+          textColor: "#0e100f",
+          accentA: "#9d95ff",
+          accentB: "#fff0fb",
+        },
+        {
+          name: "34 Pink Blue Soft",
+          gradient: "radial-gradient(92% 104% at 80% 18%, #fec5fb 0%, #b8d6ff 54%, #00bae2 112%)",
+          textColor: "#0e100f",
+          accentA: "#fec5fb",
+          accentB: "#00bae2",
+        },
+        {
+          name: "35 Macha Cream",
+          gradient: "linear-gradient(112deg, #0ae448 0%, #abff84 48%, #fbfefa 100%)",
+          textColor: "#0e100f",
+          accentA: "#0ae448",
+          accentB: "#fbfefa",
+        },
+        {
+          name: "36 Green Citrus",
+          gradient: "radial-gradient(92% 112% at 16% 84%, #0ae448 0%, #abff84 64%, #ffd9b0 118%)",
+          textColor: "#0e100f",
+          accentA: "#0ae448",
+          accentB: "#ffd9b0",
+        },
+        {
+          name: "37 Mint Pink",
+          gradient: "linear-gradient(130deg, #abff84 0%, #e8ffdd 50%, #fec5fb 100%)",
+          textColor: "#0e100f",
+          accentA: "#abff84",
+          accentB: "#fec5fb",
+        },
+        {
+          name: "38 Mint Violet",
+          gradient: "radial-gradient(104% 118% at 76% 18%, #abff84 0%, #b8d6ff 52%, #9d95ff 112%)",
+          textColor: "#0e100f",
+          accentA: "#abff84",
+          accentB: "#9d95ff",
+        },
+        {
+          name: "39 Aqua Green",
+          gradient: "linear-gradient(146deg, #00bae2 0%, #71f4b0 48%, #0ae448 100%)",
+          textColor: "#0e100f",
+          accentA: "#00bae2",
+          accentB: "#0ae448",
+        },
+        {
+          name: "40 Aqua Cream",
+          gradient: "radial-gradient(78% 96% at 72% 28%, #00bae2 0%, #9bedff 52%, #fbfefa 112%)",
+          textColor: "#0e100f",
+          accentA: "#00bae2",
+          accentB: "#fbfefa",
+        },
+        {
+          name: "41 Blue Lilac",
+          gradient: "linear-gradient(138deg, #15bfe4 0%, #9d95ff 54%, #c9b7ff 108%)",
+          textColor: "#0e100f",
+          accentA: "#15bfe4",
+          accentB: "#9d95ff",
+        },
+        {
+          name: "42 Blue Pink Arc",
+          gradient: "radial-gradient(108% 120% at 12% 88%, #15bfe4 0%, #9bedff 50%, #fec5fb 118%)",
+          textColor: "#0e100f",
+          accentA: "#00bae2",
+          accentB: "#fec5fb",
+        },
+        {
+          name: "43 Violet Rose",
+          gradient: "linear-gradient(128deg, #9d95ff 0%, #c9b7ff 44%, #f08ad8 110%)",
+          textColor: "#0e100f",
+          accentA: "#9d95ff",
+          accentB: "#f08ad8",
+        },
+        {
+          name: "44 Rose Orange",
+          gradient: "radial-gradient(96% 112% at 14% 16%, #fec5fb 0%, #f08ad8 54%, #ffd9b0 120%)",
+          textColor: "#0e100f",
+          accentA: "#fec5fb",
+          accentB: "#ff8709",
+        },
+        {
+          name: "45 Purple Mint",
+          gradient: "linear-gradient(140deg, #9d95ff 0%, #c9b7ff 48%, #abff84 112%)",
+          textColor: "#0e100f",
+          accentA: "#9d95ff",
+          accentB: "#abff84",
+        },
+        {
+          name: "46 Green Lilac",
+          gradient: "radial-gradient(106% 118% at 84% 12%, #0ae448 0%, #abff84 42%, #9d95ff 112%)",
+          textColor: "#0e100f",
+          accentA: "#0ae448",
+          accentB: "#9d95ff",
+        },
+        {
+          name: "47 Orange Lilac",
+          gradient: "linear-gradient(132deg, #ff8709 0%, #f7bdf8 48%, #9d95ff 108%)",
+          textColor: "#0e100f",
+          accentA: "#ff8709",
+          accentB: "#9d95ff",
+        },
+        {
+          name: "48 Violet Tangerine",
+          gradient: "radial-gradient(104% 118% at 12% 88%, #9d95ff 0%, #f7bdf8 58%, #ffd9b0 120%)",
+          textColor: "#0e100f",
+          accentA: "#9d95ff",
+          accentB: "#ff8709",
+        },
+        {
+          name: "49 Green Orange",
+          gradient: "linear-gradient(136deg, #0ae448 0%, #abff84 46%, #ffd9b0 112%)",
+          textColor: "#0e100f",
+          accentA: "#0ae448",
+          accentB: "#ff8709",
+        },
+        {
+          name: "50 Soft Spectrum",
+          gradient: "radial-gradient(118% 132% at 14% 86%, #abff84 0%, #9bedff 52%, #f7bdf8 118%)",
+          textColor: "#0e100f",
+          accentA: "#abff84",
+          accentB: "#f7bdf8",
+        },
+        {
+          name: "51 Poster Pink Yellow",
+          gradient: "linear-gradient(124deg, #ff00d4 0%, #f7bdf8 48%, #fff200 112%)",
+          textColor: "#0e100f",
+          accentA: "#ff00d4",
+          accentB: "#fff200",
+        },
+        {
+          name: "52 Poster Yellow Pink Arc",
+          gradient: "radial-gradient(104% 118% at 12% 86%, #fff200 0%, #ffd9b0 48%, #ff00d4 118%)",
+          textColor: "#0e100f",
+          accentA: "#fff200",
+          accentB: "#ff00d4",
+        },
+        {
+          name: "53 Poster Purple Pink",
+          gradient: "linear-gradient(132deg, #5a20ff 0%, #b987ff 48%, #ff00d4 112%)",
+          textColor: "#fffce1",
+          accentA: "#5a20ff",
+          accentB: "#ff00d4",
+        },
+        {
+          name: "54 Poster Pink Purple Bloom",
+          gradient: "radial-gradient(98% 112% at 18% 16%, #fec5fb 0%, #ff00d4 48%, #5a20ff 118%)",
+          textColor: "#fffce1",
+          accentA: "#ff00d4",
+          accentB: "#5a20ff",
+        },
+        {
+          name: "55 Poster Orange Yellow",
+          gradient: "linear-gradient(118deg, #ff6b00 0%, #ffb000 52%, #fff200 112%)",
+          textColor: "#0e100f",
+          accentA: "#ff6b00",
+          accentB: "#fff200",
+        },
+        {
+          name: "56 Poster Orange Pink",
+          gradient: "radial-gradient(104% 116% at 12% 88%, #ff6b00 0%, #ff9a54 48%, #ff00d4 118%)",
+          textColor: "#0e100f",
+          accentA: "#ff6b00",
+          accentB: "#ff00d4",
+        },
+        {
+          name: "57 Poster Red Pink",
+          gradient: "linear-gradient(126deg, #ff355e 0%, #f08ad8 54%, #fec5fb 112%)",
+          textColor: "#0e100f",
+          accentA: "#ff355e",
+          accentB: "#fec5fb",
+        },
+        {
+          name: "58 Poster Violet Yellow",
+          gradient: "linear-gradient(132deg, #5a20ff 0%, #b987ff 50%, #fff200 118%)",
+          textColor: "#fffce1",
+          accentA: "#5a20ff",
+          accentB: "#fff200",
+        },
+        {
+          name: "59 Poster Yellow Violet Arc",
+          gradient: "radial-gradient(106% 122% at 12% 88%, #fff200 0%, #ffd9b0 44%, #5a20ff 118%)",
+          textColor: "#0e100f",
+          accentA: "#fff200",
+          accentB: "#5a20ff",
+        },
+        {
+          name: "60 Poster Star Pink",
+          gradient: "linear-gradient(138deg, #fff200 0%, #ff00d4 48%, #f7bdf8 108%)",
+          textColor: "#0e100f",
+          accentA: "#fff200",
+          accentB: "#f7bdf8",
+        },
+        {
+          name: "61 Poster Star Orange",
+          gradient: "radial-gradient(96% 112% at 82% 20%, #fff200 0%, #ffb000 44%, #ff6b00 112%)",
+          textColor: "#0e100f",
+          accentA: "#fff200",
+          accentB: "#ff6b00",
+        },
+        {
+          name: "62 Poster Purple Orange",
+          gradient: "linear-gradient(132deg, #5a20ff 0%, #b987ff 48%, #ff6b00 118%)",
+          textColor: "#fffce1",
+          accentA: "#5a20ff",
+          accentB: "#ff6b00",
+        },
+        {
+          name: "63 Poster Neon Pink",
+          gradient: "radial-gradient(100% 116% at 10% 18%, #fec5fb 0%, #ff00d4 54%, #f08ad8 112%)",
+          textColor: "#0e100f",
+          accentA: "#fec5fb",
+          accentB: "#ff00d4",
+        },
+        {
+          name: "64 Poster Lilac Yellow",
+          gradient: "linear-gradient(128deg, #b987ff 0%, #fec5fb 48%, #fff200 112%)",
+          textColor: "#0e100f",
+          accentA: "#b987ff",
+          accentB: "#fff200",
+        },
+        {
+          name: "65 Poster Pink Orange Yellow",
+          gradient: "linear-gradient(124deg, #ff00d4 0%, #ff9a54 48%, #fff200 112%)",
+          textColor: "#0e100f",
+          accentA: "#ff00d4",
+          accentB: "#fff200",
+        },
+        {
+          name: "66 Poster Shape Mix",
+          gradient: "radial-gradient(118% 132% at 16% 84%, #ff00d4 0%, #fff200 46%, #5a20ff 118%)",
+          textColor: "#0e100f",
+          accentA: "#ff00d4",
+          accentB: "#5a20ff",
+        },
+      ];
+
+      const grid = document.querySelector("#gradientGrid");
+
+      grid.innerHTML = gradients
+        .map(
+          (item) => `
+            <article class="gradient-set" style="--gradient: ${item.gradient}; --accent-a: ${item.accentA}; --accent-b: ${item.accentB}; --sample-text: ${item.textColor}; --button-text: ${item.textColor};">
+              <div class="set-inner">
+                <button class="sample-button" type="button" data-copy="background: ${item.gradient};
+color: ${item.textColor};"><span class="button-label">button</span></button>
+                <div class="spec">
+                  <code>background: ${item.gradient};
+color: ${item.textColor};</code>
+                </div>
+              </div>
+            </article>
+          `,
+        )
+        .join("");
+
+      document.querySelectorAll(".sample-button").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const css = button.dataset.copy ?? "";
+          const label = button.querySelector(".button-label");
+          const original = label.textContent;
+
+          try {
+            await navigator.clipboard.writeText(css);
+            label.textContent = "copied";
+          } catch {
+            const textarea = document.createElement("textarea");
+            textarea.value = css;
+            textarea.setAttribute("readonly", "");
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            textarea.remove();
+            label.textContent = "copied";
+          }
+
+          window.setTimeout(() => {
+            label.textContent = original;
+          }, 900);
+        });
+      });
+
+      const magneticStrength = 0.18;
+      const labelStrength = 0.1;
+      const supportsFinePointer = window.matchMedia("(pointer: fine)").matches;
+
+      function mapRange(inMin, inMax, outMin, outMax, value) {
+        return outMin + ((value - inMin) / (inMax - inMin)) * (outMax - outMin);
+      }
+
+      function animateMagnetic(element, x, y, duration = 400, easing = "cubic-bezier(0.22, 1, 0.36, 1)") {
+        if (window.gsap) {
+          gsap.to(element, {
+            x,
+            y,
+            duration: duration / 1000,
+            ease: duration > 500 ? "elastic.out(1, 0.4)" : "power2.out",
+            overwrite: true,
+          });
+          return;
+        }
+
+        element.style.transition = `transform ${duration}ms ${easing}`;
+        element.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      }
+
+      if (supportsFinePointer) {
+        let activeZone = null;
+
+        function resetZone(zone) {
+          if (!zone) return;
+          const button = zone.querySelector(".sample-button");
+          const label = zone.querySelector(".button-label");
+          animateMagnetic(button, 0, 0, 700, "cubic-bezier(0.34, 1.56, 0.64, 1)");
+          animateMagnetic(label, 0, 0, 700, "cubic-bezier(0.34, 1.56, 0.64, 1)");
+        }
+
+        document.querySelectorAll(".gradient-set").forEach((zone) => {
+          const button = zone.querySelector(".sample-button");
+          const label = zone.querySelector(".button-label");
+
+          zone.addEventListener("mousemove", (event) => {
+            activeZone = zone;
+            const rect = zone.getBoundingClientRect();
+            const mappedX = mapRange(rect.left, rect.right, -rect.width / 2, rect.width / 2, event.clientX);
+            const mappedY = mapRange(rect.top, rect.bottom, -rect.height / 2, rect.height / 2, event.clientY);
+
+            animateMagnetic(button, mappedX * magneticStrength, mappedY * magneticStrength, 400);
+            animateMagnetic(label, mappedX * labelStrength, mappedY * labelStrength, 400);
+          });
+
+          zone.addEventListener("mouseleave", () => {
+            resetZone(zone);
+            if (activeZone === zone) activeZone = null;
+          });
+        });
+
+        document.addEventListener("mousemove", (event) => {
+          if (!activeZone) return;
+          const rect = activeZone.getBoundingClientRect();
+          const inside =
+            event.clientX >= rect.left &&
+            event.clientX <= rect.right &&
+            event.clientY >= rect.top &&
+            event.clientY <= rect.bottom;
+
+          if (!inside) {
+            resetZone(activeZone);
+            activeZone = null;
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
