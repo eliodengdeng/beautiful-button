@@ -1,90 +1,25 @@
 .DS_Store
 
-# Local agent/config
-.agents/
-
-# Project snapshots kept outside GitHub
-比赛官网-白版/
-比赛官网-黑版/
-比赛官网2.0/
-
-# Local contest website files not part of beautiful-button
-components.json
-package-lock.json
-package.json
-postcss.config.js
-public/
-skills-lock.json
-src/
-tailwind.config.ts
-tsconfig.json
-tsconfig.node.json
-vite.config.d.ts
-vite.config.js
-vite.config.ts
-文字.pdf
-
 # Logs
-logs
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Dependency directories
+# Dependencies
 node_modules/
-jspm_packages/
-web_modules/
 
-# Build outputs
+# Build output
 dist/
 out/
-.output/
-build/Release
-
-# TypeScript / tool caches
-*.tsbuildinfo
-.vite/
-.cache/
-.parcel-cache
-.eslintcache
-.stylelintcache
-.nyc_output
-coverage
-*.lcov
+build/
 
 # Environment files
 .env
 .env.*
 !.env.example
 
-# Framework caches
-.next
-.nuxt
-.svelte-kit/
-.docusaurus
-.serverless/
-.firebase/
-**/.vitepress/dist
-**/.vitepress/cache
-
-# Package manager artifacts
-.npm
-*.tgz
-.yarn-integrity
-.pnpm-store
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+# Tool caches
+.cache/
+.vite/
+*.tsbuildinfo
