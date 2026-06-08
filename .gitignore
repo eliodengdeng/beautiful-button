@@ -1,0 +1,15 @@
+.DS_Store
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.agents/
+比赛官网-白版/
+比赛官网-黑版/
+比赛官网2.0/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
