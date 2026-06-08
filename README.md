@@ -19,7 +19,9 @@ This repository is connected to GitHub Pages from the `main` branch. After updat
 
 ## How To Use
 
-Use the live page link above for the interactive version. GitHub's file viewer shows HTML source code, so clicking `渐变button/index.html` inside the repository is for viewing or downloading the file, not for running the page.
+Open the interactive page here: [https://eliodengdeng.github.io/beautiful-button/](https://eliodengdeng.github.io/beautiful-button/)
+
+GitHub's file viewer shows HTML source code, so clicking `渐变button/index.html` inside the repository is for viewing or downloading the file, not for running the page.
 
 You can also download the repository and open `渐变button/index.html` directly in a browser.
 
